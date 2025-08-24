@@ -4,6 +4,7 @@ FROM python:3.9-slim
 RUN apt-get update && apt-get install -y \
     build-essential \
     libpq-dev \
+    netcat-traditional \
     && rm -rf /var/lib/apt/lists/*
 
 # Создание рабочей директории
@@ -17,6 +18,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 # Копирование конфигурационных файлов
 COPY label_studio_config.py .
+COPY entrypoint.sh .
+RUN chmod +x entrypoint.sh
 
 # Создание директорий для данных
 RUN mkdir -p /app/data /app/media
@@ -31,4 +34,5 @@ ENV LABEL_STUDIO_MEDIA_DIR=/app/media
 EXPOSE 8080
 
 # Команда запуска
+ENTRYPOINT ["./entrypoint.sh"]
 CMD ["label-studio", "start", "--host", "0.0.0.0", "--port", "8080", "--data-dir", "/app/data"]

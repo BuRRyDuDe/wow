@@ -12,7 +12,13 @@ variables = {
   LABEL_STUDIO_DATA_DIR = "/app/data",
   LABEL_STUDIO_MEDIA_DIR = "/app/media",
   DJANGO_SETTINGS_MODULE = "label_studio.settings.label_studio",
-  LABEL_STUDIO_DISABLE_SIGNUP_WITHOUT_LINK = "true"
+  LABEL_STUDIO_DISABLE_SIGNUP_WITHOUT_LINK = "true",
+  DATABASE_URL = "${{Postgres.DATABASE_URL}}",
+  POSTGRES_DB = "${{Postgres.POSTGRES_DB}}",
+  POSTGRES_USER = "${{Postgres.POSTGRES_USER}}",
+  POSTGRES_PASSWORD = "${{Postgres.POSTGRES_PASSWORD}}",
+  POSTGRES_HOST = "${{Postgres.POSTGRES_HOST}}",
+  POSTGRES_PORT = "${{Postgres.POSTGRES_PORT}}"
 }
 
 [environments.production.services]
