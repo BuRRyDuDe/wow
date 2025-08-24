@@ -2,7 +2,7 @@
 builder = "dockerfile"
 
 [deploy]
-startCommand = "label-studio start --host 0.0.0.0 --port $PORT --data-dir /app/data"
+startCommand = "sh -c 'label-studio start --host 0.0.0.0 --port ${PORT:-8080} --data-dir /app/data'"
 restartPolicyType = "on_failure"
 restartPolicyMaxRetries = 3
 
