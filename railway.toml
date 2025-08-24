@@ -1,0 +1,19 @@
+[build]
+builder = "dockerfile"
+
+[deploy]
+startCommand = "label-studio start --host 0.0.0.0 --port $PORT --data-dir /app/data"
+restartPolicyType = "on_failure"
+restartPolicyMaxRetries = 3
+
+[environments.production]
+variables = {
+  LABEL_STUDIO_HOST = "0.0.0.0",
+  LABEL_STUDIO_DATA_DIR = "/app/data",
+  LABEL_STUDIO_MEDIA_DIR = "/app/media",
+  DJANGO_SETTINGS_MODULE = "label_studio.settings.label_studio",
+  LABEL_STUDIO_DISABLE_SIGNUP_WITHOUT_LINK = "true"
+}
+
+[environments.production.services]
+postgres = { plan = "hobby" }

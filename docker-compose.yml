@@ -1,0 +1,41 @@
+version: '3.8'
+
+services:
+  label-studio:
+    build: .
+    ports:
+      - "8080:8080"
+    environment:
+      - LABEL_STUDIO_HOST=0.0.0.0
+      - LABEL_STUDIO_PORT=8080
+      - LABEL_STUDIO_DATA_DIR=/app/data
+      - LABEL_STUDIO_MEDIA_DIR=/app/media
+      - DJANGO_DB=default
+      - POSTGRE_NAME=${POSTGRE_NAME:-labelstudio}
+      - POSTGRE_USER=${POSTGRE_USER:-postgres}
+      - POSTGRE_PASSWORD=${POSTGRE_PASSWORD:-password}
+      - POSTGRE_HOST=${POSTGRE_HOST:-postgres}
+      - POSTGRE_PORT=${POSTGRE_PORT:-5432}
+    volumes:
+      - label_studio_data:/app/data
+      - label_studio_media:/app/media
+    depends_on:
+      - postgres
+    restart: unless-stopped
+
+  postgres:
+    image: postgres:13
+    environment:
+      - POSTGRES_DB=${POSTGRE_NAME:-labelstudio}
+      - POSTGRES_USER=${POSTGRE_USER:-postgres}
+      - POSTGRES_PASSWORD=${POSTGRE_PASSWORD:-password}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    restart: unless-stopped
+
+volumes:
+  label_studio_data:
+  label_studio_media:
+  postgres_data:
