@@ -5,6 +5,9 @@ RUN apt-get update && apt-get install -y \
     build-essential \
     libpq-dev \
     netcat-traditional \
+    libwebp-dev \
+    libjpeg-dev \
+    libpng-dev \
     && rm -rf /var/lib/apt/lists/*
 
 # Создание рабочей директории
@@ -14,7 +17,7 @@ WORKDIR /app
 COPY requirements.txt .
 
 # Установка Python зависимостей
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt pillow
 
 # Копирование конфигурационных файлов
 COPY label_studio_config.py .

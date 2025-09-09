@@ -19,6 +19,8 @@ variables = {
   POSTGRES_PASSWORD = "${{Postgres.POSTGRES_PASSWORD}}",
   POSTGRES_HOST = "${{Postgres.POSTGRES_HOST}}",
   POSTGRES_PORT = "${{Postgres.POSTGRES_PORT}}"
+  GOOGLE_APPLICATION_CREDENTIALS = "${{GoogleCloudStorage.GOOGLE_APPLICATION_CREDENTIALS}}"
+  GCS_BUCKET_NAME = "${{GoogleCloudStorage.GCS_BUCKET_NAME}}"
 }
 
 [environments.production.services]

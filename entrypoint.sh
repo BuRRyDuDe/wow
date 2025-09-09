@@ -24,6 +24,12 @@ else:
     print('Superuser already exists')
 "
 
+# Run image processing if image_processor.py exists
+if [ -f "/app/image_processor.py" ]; then
+    echo "Running image processor..."
+    python /app/image_processor.py
+fi
+
 # Запуск Label Studio
 echo "Starting Label Studio..."
 exec "$@"

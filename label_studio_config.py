@@ -1,5 +1,19 @@
 import os
 from label_studio.core.settings.base import *
+import os
+
+# Google Cloud Storage settings
+if os.getenv('GCS_BUCKET_NAME'):
+    DEFAULT_FILE_STORAGE = 'storages.backends.gcloud.GoogleCloudStorage'
+    GS_BUCKET_NAME = os.getenv('GCS_BUCKET_NAME')
+    GS_CREDENTIALS = os.getenv('GOOGLE_APPLICATION_CREDENTIALS')
+    GS_AUTO_CREATE_BUCKET = True
+    GS_DEFAULT_ACL = 'publicRead'
+    GS_QUERYSTRING_AUTH = True
+    GS_FILE_OVERWRITE = False
+    GS_MAX_MEMORY_SIZE = 0 # Use 0 to stream directly to GCS
+
+
 
 # Основные настройки
 DEBUG = os.getenv('DEBUG', 'False').lower() == 'true'
@@ -20,6 +34,7 @@ else:
             'PASSWORD': os.getenv('POSTGRE_PASSWORD', 'password'),
             'HOST': os.getenv('POSTGRE_HOST', 'localhost'),
             'PORT': os.getenv('POSTGRE_PORT', '5432'),
+            'CONN_MAX_AGE': 300,  # Пулинг соединений на 5 минут
         }
     }
 
@@ -49,6 +64,20 @@ LABEL_STUDIO_PORT = int(os.getenv('PORT', os.getenv('LABEL_STUDIO_PORT', '8080')
 
 # Отключение регистрации без ссылки
 DISABLE_SIGNUP_WITHOUT_LINK = os.getenv('LABEL_STUDIO_DISABLE_SIGNUP_WITHOUT_LINK', 'true').lower() == 'true'
+
+ROOT_URLCONF = 'wow.urls'
+
+# Приложения Django
+INSTALLED_APPS = (
+    'label_studio',
+    'label_studio.core',
+    'health_check',
+    'health_check.db',
+    'health_check.cache',
+    'health_check.storage',
+    'health_check.contrib.migrations',
+    'health_check.contrib.psutil',
+)
 
 # Настройки логирования
 LOGGING = {
