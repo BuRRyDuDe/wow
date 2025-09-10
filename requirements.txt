@@ -5,9 +5,9 @@ django-filter==23.1
 django-storages==1.12.3
 psycopg2-binary==2.9.9
 label-studio
-label-studio-sdk==0.0.30
+label-studio-sdk
 label-studio-tools
-celery==5.3.6
+celery
 redis==5.0.1
 flower==2.0.1
  Pillow==10.0.1
