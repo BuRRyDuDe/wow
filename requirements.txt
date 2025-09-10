@@ -22,7 +22,7 @@ flower==2.0.1
 # Web server and utils
 gunicorn==21.2.0
 pillow==10.0.1
-whitesnoise==6.5.0
+whitenoise==6.5.0
 
 # Health checks
 django-health-check==3.17.0
