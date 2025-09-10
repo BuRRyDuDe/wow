@@ -1,5 +1,9 @@
 FROM python:3.9-slim
 
+# Установка Rust для компиляции orjson
+RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
+ENV PATH="/root/.cargo/bin:${PATH}"
+
 # Установка системных зависимостей
 RUN apt-get update && apt-get install -y \
     build-essential \
