@@ -1,4 +1,4 @@
-# Fixed pinned versions that work together
+# Core dependencies
 cymem==2.0.8
 
 # Django stack - compatible versions
@@ -27,3 +27,15 @@ google-cloud-storage
 
 # Health checks
 django-health-check
+
+# Missing runtime dependencies for label-studio
+colorama>=0.4.4
+six>=1.12.0
+requests>=2.22.0
+tqdm>=4.40.2
+numpy>=1.17.4
+pandas>=0.24.0
+lxml>=4.5.0
+packaging>=20.0
+setuptools>=40.0
+wheel>=0.34.0
