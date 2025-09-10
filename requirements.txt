@@ -3,7 +3,7 @@ cymem==2.0.8
 
 # Django stack - compatible versions
 Django==3.2.20
-djangorestframework==3.14.0
+djangorestframework==3.13.1
 django-filter==2.4.0
 django-storages==1.12.3
 psycopg2-binary==2.9.9
