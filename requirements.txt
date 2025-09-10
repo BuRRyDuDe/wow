@@ -7,6 +7,7 @@ djangorestframework==3.15.2
 django-filter==2.4.0
 django-storages==1.12.3
 psycopg2-binary==2.9.9
+dj-database-url==2.1.0
 
 # Label Studio ecosystem
 label-studio==1.8.2
@@ -20,13 +21,15 @@ flower==2.0.1
 
 # Web server and utils
 gunicorn==21.2.0
-pillow
-
-# Cloud storage
-google-cloud-storage
+pillow==10.0.1
+whitesnoise==6.5.0
 
 # Health checks
-django-health-check
+django-health-check==3.17.0
+
+# Performance optimization
+uvicorn==0.23.2
+asgiref==3.7.2
 
 # Missing runtime dependencies for label-studio
 colorama>=0.4.4

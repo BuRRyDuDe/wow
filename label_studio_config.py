@@ -2,19 +2,6 @@ import os
 from label_studio.core.settings.base import *
 import os
 
-# Google Cloud Storage settings
-if os.getenv('GCS_BUCKET_NAME'):
-    DEFAULT_FILE_STORAGE = 'storages.backends.gcloud.GoogleCloudStorage'
-    GS_BUCKET_NAME = os.getenv('GCS_BUCKET_NAME')
-    GS_CREDENTIALS = os.getenv('GOOGLE_APPLICATION_CREDENTIALS')
-    GS_AUTO_CREATE_BUCKET = True
-    GS_DEFAULT_ACL = 'publicRead'
-    GS_QUERYSTRING_AUTH = True
-    GS_FILE_OVERWRITE = False
-    GS_MAX_MEMORY_SIZE = 0 # Use 0 to stream directly to GCS
-
-
-
 # Основные настройки
 DEBUG = os.getenv('DEBUG', 'False').lower() == 'true'
 ALLOWED_HOSTS = ['*']
@@ -29,12 +16,19 @@ else:
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql',
-            'NAME': os.getenv('POSTGRE_NAME', 'labelstudio'),
-            'USER': os.getenv('POSTGRE_USER', 'postgres'),
-            'PASSWORD': os.getenv('POSTGRE_PASSWORD', 'password'),
-            'HOST': os.getenv('POSTGRE_HOST', 'localhost'),
-            'PORT': os.getenv('POSTGRE_PORT', '5432'),
-            'CONN_MAX_AGE': 300,  # Пулинг соединений на 5 минут
+            'NAME': os.getenv('POSTGRES_DB', 'labelstudio'),
+            'USER': os.getenv('POSTGRES_USER', 'postgres'),
+            'PASSWORD': os.getenv('POSTGRES_PASSWORD', 'password'),
+            'HOST': os.getenv('POSTGRES_HOST', 'localhost'),
+            'PORT': os.getenv('POSTGRES_PORT', '5432'),
+            'CONN_MAX_AGE': 600,  # Увеличенный пулинг соединений до 10 минут
+            'OPTIONS': {
+                'connect_timeout': 10,
+                'keepalives': 1,
+                'keepalives_idle': 30,
+                'keepalives_interval': 10,
+                'keepalives_count': 5,
+            }
         }
     }
 
@@ -42,54 +36,44 @@ else:
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.getenv('LABEL_STUDIO_MEDIA_DIR', '/app/media')
 
-# Настройки статических файлов
+# Настройки статических файлов с использованием whitenoise
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # Настройки безопасности
 SECRET_KEY = os.getenv('SECRET_KEY', 'your-secret-key-here')
-CSRF_TRUSTED_ORIGINS = [
-    'https://*.railway.app',
-    'http://localhost:8080',
-    'http://127.0.0.1:8080'
-]
 
-# Настройки CORS
-CORS_ALLOW_ALL_ORIGINS = True
-CORS_ALLOW_CREDENTIALS = True
+# Оптимизация производительности
+WSGI_APPLICATION = 'label_studio.core.wsgi.application'
 
-# Настройки Label Studio
-LABEL_STUDIO_HOST = os.getenv('LABEL_STUDIO_HOST', '0.0.0.0')
-LABEL_STUDIO_PORT = int(os.getenv('PORT', os.getenv('LABEL_STUDIO_PORT', '8080')))
-
-# Отключение регистрации без ссылки
-DISABLE_SIGNUP_WITHOUT_LINK = os.getenv('LABEL_STUDIO_DISABLE_SIGNUP_WITHOUT_LINK', 'true').lower() == 'true'
-
-ROOT_URLCONF = 'wow.urls'
-
-# Приложения Django
-INSTALLED_APPS = (
-    'label_studio',
-    'label_studio.core',
-    'health_check',
-    'health_check.db',
-    'health_check.cache',
-    'health_check.storage',
-    'health_check.contrib.migrations',
-    'health_check.contrib.psutil',
-)
-
-# Настройки логирования
-LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'handlers': {
-        'console': {
-            'class': 'logging.StreamHandler',
-        },
-    },
-    'root': {
-        'handlers': ['console'],
-        'level': 'INFO',
-    },
+# Кэширование
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'LOCATION': 'unique-snowflake',
+        'TIMEOUT': 300,
+    }
 }
+
+# Если доступен Redis, используем его для кэширования
+if os.getenv('REDIS_URL'):
+    CACHES['default'] = {
+        'BACKEND': 'django.core.cache.backends.redis.RedisCache',
+        'LOCATION': os.getenv('REDIS_URL'),
+        'OPTIONS': {
+            'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+        }
+    }
+    # Используем Redis для сессий
+    SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
+    SESSION_CACHE_ALIAS = 'default'
+
+# Оптимизация для Railway
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+SECURE_SSL_REDIRECT = False
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
+
+# Настройки для Label Studio
+LABEL_STUDIO_DISABLE_SIGNUP_WITHOUT_LINK = os.getenv('LABEL_STUDIO_DISABLE_SIGNUP_WITHOUT_LINK', 'true').lower() == 'true'

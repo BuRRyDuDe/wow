@@ -1,16 +1,27 @@
 #!/bin/bash
 set -e
 
-# Ожидание доступности базы данных
-echo "Waiting for database..."
-while ! nc -z $POSTGRES_HOST $POSTGRES_PORT; do
-  sleep 0.1
-done
-echo "Database is ready!"
+# Функция для проверки доступности базы данных
+wait_for_postgres() {
+  echo "Waiting for database..."
+  while ! nc -z $POSTGRES_HOST $POSTGRES_PORT; do
+    sleep 0.5
+  done
+  echo "Database is ready!"
+}
+
+# Проверка доступности базы данных
+wait_for_postgres
 
 # Выполнение миграций Django
 echo "Running database migrations..."
 label-studio migrate
+
+# Сбор статических файлов, если они еще не собраны
+if [ ! -d "/app/staticfiles" ] || [ -z "$(ls -A /app/staticfiles)" ]; then
+  echo "Collecting static files..."
+  label-studio collectstatic --no-input
+fi
 
 # Создание суперпользователя если он не существует
 echo "Creating superuser if not exists..."
@@ -24,12 +35,11 @@ else:
     print('Superuser already exists')
 "
 
-# Run image processing if image_processor.py exists
+# Запуск обработчика изображений, если файл существует
 if [ -f "/app/image_processor.py" ]; then
     echo "Running image processor..."
     python /app/image_processor.py
 fi
 
-# Запуск Label Studio
-echo "Starting Label Studio..."
+# Запуск основного приложения
 exec "$@"

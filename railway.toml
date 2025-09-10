@@ -1,27 +1,51 @@
 [build]
-builder = "dockerfile"
+  builder = "dockerfile"
+  buildCommand = ""
 
 [deploy]
-startCommand = "sh -c 'label-studio start --host 0.0.0.0 --port ${PORT:-8080} --data-dir /app/data'"
-restartPolicyType = "on_failure"
-restartPolicyMaxRetries = 3
+  startCommand = "sh -c 'label-studio start --host 0.0.0.0 --port ${PORT:-8080} --data-dir /app/data'"
+  healthcheckPath = "/health/"
+  healthcheckTimeout = 300
+  restartPolicyType = "on_failure"
+  restartPolicyMaxRetries = 3
 
-[environments.production]
-variables = {
-  LABEL_STUDIO_HOST = "0.0.0.0",
-  LABEL_STUDIO_DATA_DIR = "/app/data",
-  LABEL_STUDIO_MEDIA_DIR = "/app/media",
-  DJANGO_SETTINGS_MODULE = "label_studio.settings.label_studio",
-  LABEL_STUDIO_DISABLE_SIGNUP_WITHOUT_LINK = "true",
-  DATABASE_URL = "${{Postgres.DATABASE_URL}}",
-  POSTGRES_DB = "${{Postgres.POSTGRES_DB}}",
-  POSTGRES_USER = "${{Postgres.POSTGRES_USER}}",
-  POSTGRES_PASSWORD = "${{Postgres.POSTGRES_PASSWORD}}",
-  POSTGRES_HOST = "${{Postgres.POSTGRES_HOST}}",
-  POSTGRES_PORT = "${{Postgres.POSTGRES_PORT}}",
-  GOOGLE_APPLICATION_CREDENTIALS = "${{GoogleCloudStorage.GOOGLE_APPLICATION_CREDENTIALS}}",
-  GCS_BUCKET_NAME = "${{GoogleCloudStorage.GCS_BUCKET_NAME}}"
-}
+[production]
+  # Настройки окружения для Railway
+  PORT = "8080"
+  LABEL_STUDIO_HOST = "0.0.0.0"
+  LABEL_STUDIO_PORT = "8080"
+  LABEL_STUDIO_BASE_DATA_DIR = "/app/data"
+  LABEL_STUDIO_USE_REDIS = "true"
+  LABEL_STUDIO_DISABLE_SIGNUP_WITHOUT_LINK = "true"
+  LABEL_STUDIO_RANDOM_SAMPLING_SIZE = "50"
+  
+  # Оптимизация блокировки задач
+  LABEL_STUDIO_ENABLE_TASK_LOCKING = "true"
+  LABEL_STUDIO_ENABLE_TASK_LOCK_ON_SUBMIT = "true"
+  LABEL_STUDIO_ENABLE_TASK_LOCK_ON_ANNOTATION_TIMEOUT = "true"
+  LABEL_STUDIO_TASK_LOCK_TIMEOUT = "3600"
+  LABEL_STUDIO_ENABLE_TASK_LOCK_ON_SUBMIT_EXPIRATION = "true"
+  LABEL_STUDIO_TASK_LOCK_ON_SUBMIT_EXPIRATION_TIME = "3600"
+  LABEL_STUDIO_ENABLE_PROJECT_LOCK_ON_TRANSFER = "true"
+  
+  # Автосохранение для предотвращения потери данных
+  LABEL_STUDIO_ENABLE_AUTO_SAVE = "true"
+  LABEL_STUDIO_AUTO_SAVE_TIMER = "5000"
+  
+  # Настройки базы данных
+  DATABASE_URL = "${{Postgres.DATABASE_URL}}"
+  POSTGRES_DB = "${{Postgres.POSTGRES_DB}}"
+  POSTGRES_USER = "${{Postgres.POSTGRES_USER}}"
+  POSTGRES_PASSWORD = "${{Postgres.POSTGRES_PASSWORD}}"
+  POSTGRES_HOST = "${{Postgres.POSTGRES_HOST}}"
+  POSTGRES_PORT = "${{Postgres.POSTGRES_PORT}}"
+  
+  # Настройки производительности
+  LABEL_STUDIO_WORKERS = "4"
+  LABEL_STUDIO_THREADS_PER_WORKER = "4"
+  LABEL_STUDIO_OPTIMIZER_ENABLED = "true"
+  LABEL_STUDIO_SAMPLING_FAST_MODE = "true"
 
 [environments.production.services]
-postgres = { plan = "hobby" }
+  postgres = { plan = "hobby" }
+  redis = { plan = "hobby" }
