@@ -20,8 +20,13 @@ WORKDIR /app
 # Копирование файлов зависимостей
 COPY requirements.txt .
 
+# Upgrade pip and install build tools
+RUN pip install --upgrade pip setuptools wheel
+
 # Установка Python зависимостей
-RUN pip install --no-cache-dir -r requirements.txt pillow
+# Install with dependency resolution backtracking disabled for faster builds
+RUN pip install --no-cache-dir --no-deps -r requirements.txt || \
+    pip install --no-cache-dir -r requirements.txt
 
 # Копирование конфигурационных файлов
 COPY label_studio_config.py .

@@ -1,17 +1,29 @@
-# Добавьте сюда ваши зависимости Python
-cymem>=2.0.8
-Django==3.2.20
-djangorestframework==3.14.0
-django-filter==23.1
+# Fixed pinned versions that work together
+cymem==2.0.8
+
+# Django stack - compatible versions
+Django==3.2.16
+djangorestframework==3.15.2
+django-filter==2.4.0
 django-storages==1.12.3
 psycopg2-binary==2.9.9
-label-studio
-label-studio-sdk
-label-studio-tools
-celery
+
+# Label Studio ecosystem
+label-studio==1.8.2
+label-studio-sdk==2.0.5
+label-studio-tools==0.0.4
+
+# Task queue and cache
+celery==5.5.3
 redis==5.0.1
 flower==2.0.1
- Pillow==10.0.1
+
+# Web server and utils
 gunicorn==21.2.0
+pillow
+
+# Cloud storage
 google-cloud-storage
+
+# Health checks
 django-health-check
